@@ -1,0 +1,19 @@
+# Tiny CPU run used by `make smoke` to check the wiring end to end.
+extends: base.yaml
+paths:
+  data: data/smoke        # keep smoke output apart from the real dataset and manifest
+  artifacts: artifacts/smoke   # and apart from the real model, predictions and report
+feedback:
+  predictions_log: artifacts/smoke/predictions_log.jsonl
+data:
+  max_train_samples: 64
+  max_eval_samples: 32
+train:
+  epochs: 1
+  batch_size: 8
+  device: cpu
+predict:
+  latency_warmup_calls: 5
+  latency_calls: 50
+tracking:
+  experiment: support-ticket-triage-smoke

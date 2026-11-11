@@ -1,0 +1,25 @@
+{
+  "data_version": "data-v1",
+  "created": "2026-11-11T16:46:53+00:00",
+  "source": {
+    "dataset_id": "PolyAI/banking77",
+    "revision": "1846984189f2bc0ac51c6fc3a600fa9e1714e0c6"
+  },
+  "seed": 13,
+  "splits": {
+    "train": {
+      "rows": 8993,
+      "sha256": "7553e6db47c6892caf9d2c280d557498bd3ae8917d077b52ff0b34cff5f4bde3"
+    },
+    "validation": {
+      "rows": 1000,
+      "sha256": "017d595e86058bb7d1b9d966a34e1dd5f0751f8e387a575bd1d1532f189c153f"
+    },
+    "test": {
+      "rows": 3080,
+      "sha256": "7b653d570476cf83471958bc9ee46286665d20e6e657f304054953a33db371fe"
+    }
+  },
+  "labels_sha256": "233e8e40a348b5e1db448cc791f80b4b5e2bff6291f44ec650b9e4a5207496d3",
+  "corrections_applied": 0
+}

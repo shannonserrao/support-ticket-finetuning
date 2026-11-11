@@ -1,0 +1,7 @@
+extends: ../base.yaml
+paths:
+  artifacts: /content/drive/MyDrive/support-ticket-triage/artifacts
+tracking:
+  uri: file:/content/drive/MyDrive/support-ticket-triage/mlruns
+train:
+  save_every_steps: 200
