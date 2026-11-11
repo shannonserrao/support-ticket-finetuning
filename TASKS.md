@@ -24,11 +24,16 @@ Work top to bottom. Tick the box in the commit that completes the task. Each tas
     - Before resuming: write the 77 one-line label descriptions (needed regardless of model) and freeze the prompt.
 
 ## Training
-- [ ] **T-06** Implement `train.train`: tokenise, fine-tune, early stopping, checkpoints, tracker logging. Spec 02 §2–4. Check: `make smoke` finishes on CPU in under 3 minutes and logs a run.
-- [ ] **T-07** Temperature scaling on validation; store temperature with the model. Spec 02 §5. Check: validation calibration error after scaling is lower than before, logged as two metrics.
+- [x] **T-06** Implement `train.train`: tokenise, fine-tune, early stopping, checkpoints, tracker logging. Spec 02 §2–4. Check: `make smoke` finishes on CPU in under 3 minutes and logs a run.
+  - Checked 2026-11-11: the four smoke commands took 97 s on CPU and logged three runs under `artifacts/smoke/runs/`.
+  - Full run on a local RTX 2050 (4 GB) with `configs/platform/local_4gb.yaml`: train run `e74a1a4ea7c3`, 1,410 steps in 1,336 s, best validation macro F1 0.906 at step 1,100, peak GPU memory 3,068 MB. An earlier run with the base batch settings (`822f19e2b90f`) failed with CUDA out of memory.
+- [x] **T-07** Temperature scaling on validation; store temperature with the model. Spec 02 §5. Check: validation calibration error after scaling is lower than before, logged as two metrics.
+  - Checked on run `e74a1a4ea7c3`: temperature 0.890, validation ECE 0.0258 before and 0.0231 after (`val_ece_before_scaling`, `val_ece_after_scaling`).
 
 ## Inference and evaluation
-- [ ] **T-08** Implement `predict.predict`: batch inference, calibrated confidence, `route`, latency and throughput measurement, write `artifacts/predictions.jsonl` and the feedback log. Spec 06 §2–3. Check: `make predict eval` produces `artifacts/report.json`.
+- [x] **T-08** Implement `predict.predict`: batch inference, calibrated confidence, `route`, latency and throughput measurement, write `artifacts/predictions.jsonl` and the feedback log. Spec 06 §2–3. Check: `make predict eval` produces `artifacts/report.json`.
+  - Checked 2026-11-11: predict run `3f6af4769e62` and evaluate run `63549461d487` produced `artifacts/report.json` for 3,080 test tickets (accuracy 0.911, macro F1 0.911, ECE 0.009, selective accuracy at 80% coverage 0.984, 16.3% escalated at the fixed 0.80 threshold; 521 tickets/s and p95 latency 66.7 ms on the RTX 2050). Single seed, no hyperparameter search yet; accuracy is below the 0.92 release gate.
+  - Runs were tracked with the JSONL fallback (`artifacts/runs/`) because MLflow is not installed locally.
 - [ ] **T-09** Threshold selection on validation and cascade evaluation on test using cached baseline answers for escalated tickets. Spec 06 §4. Check: report contains the cascade curve and the chosen threshold; the threshold was fitted without reading the test file (unit test).
 - [ ] **T-10** Three-seed final run; mean and standard deviation reported. Spec 03 §5.
 - [ ] **T-11** Results table and cost-versus-accuracy chart generated from tracked runs into `docs/results.md`. Spec 04. Check: every number has a run ID.

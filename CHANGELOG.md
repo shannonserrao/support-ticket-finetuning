@@ -3,6 +3,7 @@
 All notable changes to specs, data, code and models. Newest first.
 
 ## [Unreleased]
+- T-06 to T-08 acceptance checks passed and recorded in `TASKS.md` with run IDs (smoke run 97 s on CPU; full local GPU run `e74a1a4ea7c3`; predict `3f6af4769e62`; evaluate `63549461d487`).
 - New config key `train.micro_batch_size` (default off) and `configs/platform/local_4gb.yaml`: batches are processed in chunks with gradient accumulation so the base configuration fits a 4 GB GPU. Spec 02 §3 updated. Batch size, step count and schedule are unchanged.
 - T-13: `data.merge_corrections` merges reviewed corrections into the training split only. Spec 05 HF-5 now spells out the cases (test items excluded and reported, validation items skipped, existing train text relabelled, new items appended as `feedback-<id>`, `NEW:` proposals skipped). Spec 01 §3 step 5 reads the path from `feedback.corrections`.
 - T-06/T-07: implemented `train.py` (custom loop: AdamW, linear warm-up and decay, mixed precision on CUDA, best-macro-F1 checkpoint, early stopping, resumable `artifacts/checkpoints/last.pt`, temperature scaling on validation) and `modeling.py` (shared device choice, length-sorted batched inference, temperature fit). Spec 02 §2–3 updated: checkpoint location and reuse rule, `model_version` format, final evaluation when the last step was not evaluated. New config key `train.resume`.
