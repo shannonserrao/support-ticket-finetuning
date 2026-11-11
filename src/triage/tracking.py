@@ -70,6 +70,12 @@ class Tracker:
         with open(self._fallback_path, "a", encoding="utf-8") as handle:
             handle.write(json.dumps(record, default=str) + "\n")
 
+    def set_tags(self, tags: dict) -> None:
+        if self.use_mlflow:
+            mlflow.set_tags({k: str(v) for k, v in tags.items()})
+        else:
+            self._write({"event": "tags", "tags": tags})
+
     def log_params(self, params: dict) -> None:
         if self.use_mlflow:
             mlflow.log_params({k: str(v)[:500] for k, v in params.items()})

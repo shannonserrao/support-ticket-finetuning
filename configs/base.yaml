@@ -45,12 +45,17 @@ predict:
 routing:
   select: validation          # validation | fixed
   confidence_threshold: 0.80  # used when select = fixed, and as the starting point
-  target_accuracy: null       # null = baseline accuracy
+  target_accuracy: null       # null = baseline accuracy on validation
+  sweep_step: 0.01            # thresholds 0.00, 0.01, ..., 1.00, plus "escalate everything"
 
 baseline:
   model: null                 # name of the expensive model; set before T-05
   usd_per_1m_input_tokens: null
   usd_per_1m_output_tokens: null
+  prompt_file: configs/baseline/prompt.yaml
+  label_descriptions_file: configs/baseline/label_descriptions.yaml
+  max_output_tokens: 20
+  bundle_dir: platforms/databricks/baseline/inputs   # written by `make baseline-bundle`, git-ignored
 
 cost:
   gpu_usd_per_hour: 0.60      # replace with your actual rate

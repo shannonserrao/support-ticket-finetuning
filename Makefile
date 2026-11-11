@@ -2,7 +2,7 @@ PY ?= python
 CONFIG ?= configs/base.yaml
 CLI = $(PY) -m triage.cli
 
-.PHONY: setup lint test verify-sources datatrain eval predict feedback-export feedback-ingest smoke release clean
+.PHONY: setup lint test verify-sources datatrain eval predict baseline-bundle baseline-import feedback-export feedback-ingest smoke release clean
 
 setup:
 	$(PY) -m pip install -e ".[dev,train]"
@@ -27,6 +27,13 @@ predict:
 
 eval:
 	$(CLI) evaluate --config $(CONFIG)
+
+baseline-bundle:
+	$(CLI) baseline-bundle --config $(CONFIG)
+
+baseline-import:
+	@test -n "$(FROM)" || (echo "usage: make baseline-import FROM=path/to/downloaded/outputs" && exit 1)
+	$(CLI) baseline-import --config $(CONFIG) --from $(FROM)
 
 feedback-export:
 	$(CLI) feedback-export --config $(CONFIG)

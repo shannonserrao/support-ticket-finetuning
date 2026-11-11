@@ -28,8 +28,10 @@ def per_class(gold: list[str], pred: list[str]) -> list[dict]:
     return rows
 
 
-def macro_f1(gold: list[str], pred: list[str]) -> float:
-    rows = per_class(gold, pred)
+def macro_f1(gold: list[str], pred: list[str], ignore: set[str] | None = None) -> float:
+    """Mean per-class F1. Labels in `ignore` (for example an "unparseable" marker that only ever appears as a
+    prediction) are left out of the mean; they still count as errors for the gold class."""
+    rows = [r for r in per_class(gold, pred) if not ignore or r["label"] not in ignore]
     return sum(r["f1"] for r in rows) / len(rows)
 
 
@@ -83,6 +85,43 @@ def cascade(
     escalated = [p < threshold for p in conf]
     right = sum(b if e else s for s, b, e in zip(small_correct, big_correct, escalated))
     return {"threshold": threshold, "accuracy": right / n, "escalation_rate": sum(escalated) / n}
+
+
+def sweep_thresholds(step: float = 0.01) -> list[float]:
+    """0.00, 0.01, ..., 1.00 and one value above 1 (escalate everything)."""
+    n = round(1 / step)
+    return [round(i * step, 6) for i in range(n + 1)] + [1.01]
+
+
+def cascade_curve(
+    small_correct: list[bool], conf: list[float], big_correct: list[bool], thresholds: list[float] | None = None,
+    small_usd_per_ticket: float | None = None, big_usd_per_ticket: float | None = None,
+) -> list[dict]:
+    """Cascade accuracy and escalation rate at each threshold, with projected cost per ticket when prices are known."""
+    rows = []
+    for threshold in thresholds or sweep_thresholds():
+        row = cascade(small_correct, conf, big_correct, threshold)
+        if small_usd_per_ticket is not None and big_usd_per_ticket is not None:
+            row["usd_per_ticket"] = small_usd_per_ticket + row["escalation_rate"] * big_usd_per_ticket
+        rows.append(row)
+    return rows
+
+
+def select_threshold(curve: list[dict], target_accuracy: float) -> dict:
+    """Cheapest point of a cascade curve that reaches `target_accuracy` (spec 06 section 4).
+
+    Cost is `usd_per_ticket` when present, otherwise the escalation rate (cost grows with escalation).
+    If no point reaches the target, the most accurate point is returned with `target_met` false.
+    """
+    def cost(row: dict) -> float:
+        return row.get("usd_per_ticket", row["escalation_rate"])
+
+    feasible = [row for row in curve if row["accuracy"] >= target_accuracy - 1e-12]
+    if feasible:
+        best = min(feasible, key=lambda row: (cost(row), row["threshold"]))
+    else:
+        best = max(curve, key=lambda row: (row["accuracy"], -cost(row)))
+    return {**best, "target_accuracy": target_accuracy, "target_met": bool(feasible)}
 
 
 def cost_per_1k(gpu_usd_per_hour: float, items_per_second: float) -> float:

@@ -1,0 +1,80 @@
+# One line per label for the zero-shot baseline prompt (spec 03 section 4).
+# Keys must equal data/labels.json exactly. Changing any line changes the prompt hash, which invalidates
+# cached baseline answers. Freeze this file before the first test-set run.
+activate_my_card: The customer wants to activate a new card or asks how activation works.
+age_limit: Questions about the minimum age to open an account or about accounts for children.
+apple_pay_or_google_pay: Setting up or problems with Apple Pay or Google Pay, including top-ups made through them.
+atm_support: Which ATMs or cash machines accept the card and where the card can be used to withdraw cash.
+automatic_top_up: Setting up, using or asking about the automatic top-up feature.
+balance_not_updated_after_bank_transfer: Money sent into the account by bank transfer has not appeared in the balance.
+balance_not_updated_after_cheque_or_cash_deposit: A cheque or cash deposit has not appeared in the balance.
+beneficiary_not_allowed: The customer cannot add a beneficiary or a transfer to a beneficiary is not permitted.
+cancel_transfer: The customer wants to cancel or reverse a transfer they made, often one sent by mistake.
+card_about_to_expire: The card expires soon and the customer asks about getting a replacement.
+card_acceptance: Where the card is accepted or why a shop or merchant would not accept it.
+card_arrival: An ordered card has not arrived yet, or the customer wants to track its delivery.
+card_delivery_estimate: How long card delivery takes, or choosing a delivery date or faster delivery.
+card_linking: Linking a new or re-found card to the app or account.
+card_not_working: The physical card does not work in general, for example it is damaged or stopped working.
+card_payment_fee_charged: An unexpected fee was charged on a card payment.
+card_payment_not_recognised: A card payment appears that the customer does not recognise or did not make.
+card_payment_wrong_exchange_rate: A card payment in a foreign currency used a wrong or poor exchange rate.
+card_swallowed: An ATM kept or swallowed the customer's card.
+cash_withdrawal_charge: A fee was charged for withdrawing cash from an ATM.
+cash_withdrawal_not_recognised: A cash withdrawal appears that the customer does not recognise or did not make.
+change_pin: The customer wants to change the card PIN or asks where this can be done.
+compromised_card: The customer believes the card details were stolen or used fraudulently while they still hold the card.
+contactless_not_working: Contactless or tap payments do not work.
+country_support: Which countries the service, accounts or cards are available in.
+declined_card_payment: A card payment was declined or rejected.
+declined_cash_withdrawal: A cash withdrawal at an ATM was declined.
+declined_transfer: A transfer was declined or rejected.
+direct_debit_payment_not_recognised: A direct debit appears that the customer does not recognise or did not set up.
+disposable_card_limits: How many disposable virtual cards are allowed or how often they can be used.
+edit_personal_details: Changing name, address, phone number or other personal details.
+exchange_charge: Fees charged for exchanging one currency for another.
+exchange_rate: What exchange rate is used or how exchange rates are set.
+exchange_via_app: How to exchange currencies in the app and which exchanges are possible.
+extra_charge_on_statement: An unexplained extra charge or fee appears on the statement.
+failed_transfer: A transfer failed or did not go through.
+fiat_currency_support: Which fiat currencies can be held or exchanged.
+get_disposable_virtual_card: How to get or create a disposable, single-use virtual card.
+get_physical_card: How to get a physical card when the customer has none or only a virtual one.
+getting_spare_card: Getting an additional or second card, for the customer or a family member.
+getting_virtual_card: How to get a virtual card.
+lost_or_stolen_card: The physical card was lost or stolen.
+lost_or_stolen_phone: The phone was lost or stolen and the customer worries about access to the account or app.
+order_physical_card: Ordering a physical card, including its cost and where it can be sent.
+passcode_forgotten: The customer forgot the app passcode or cannot log in to the app.
+pending_card_payment: A card payment is still shown as pending.
+pending_cash_withdrawal: A cash withdrawal is still shown as pending.
+pending_top_up: A top-up is still shown as pending.
+pending_transfer: A transfer is still shown as pending.
+pin_blocked: The PIN is blocked after too many wrong attempts and needs unblocking.
+receiving_money: How to receive money, a salary or payments into the account, and in which currencies.
+Refund_not_showing_up: A refund from a merchant was expected but has not appeared in the account.
+request_refund: The customer wants to request a refund for a purchase.
+"reverted_card_payment?": A card payment was reverted or the money returned, and the customer asks why.
+supported_cards_and_currencies: Which cards and currencies can be used to top up or add money.
+terminate_account: The customer wants to close or delete the account.
+top_up_by_bank_transfer_charge: Fees for topping up by bank transfer.
+top_up_by_card_charge: Fees for topping up by card.
+top_up_by_cash_or_cheque: Whether and how to top up with cash or a cheque.
+top_up_failed: A top-up failed or did not go through.
+top_up_limits: Limits on how much or how often the account can be topped up.
+top_up_reverted: A top-up was reverted or the money was returned after topping up.
+topping_up_by_card: How to top up by card, or where the money from a card top-up has gone.
+transaction_charged_twice: The same transaction was charged twice.
+transfer_fee_charged: A fee was charged for a transfer.
+transfer_into_account: How to transfer money into the customer's own account.
+transfer_not_received_by_recipient: The recipient has not received a transfer the customer sent.
+transfer_timing: How long a transfer takes to arrive.
+unable_to_verify_identity: Identity verification failed or the customer cannot complete it.
+verify_my_identity: How to verify identity and which documents are needed.
+verify_source_of_funds: Questions about verifying where money comes from, or the source of funds check.
+verify_top_up: Verifying a top-up, or a verification code or step for a top-up.
+virtual_card_not_working: The virtual card does not work or is rejected.
+visa_or_mastercard: Whether the card is Visa or Mastercard, or choosing between them.
+why_verify_identity: Why identity verification is required at all.
+wrong_amount_of_cash_received: The ATM gave a different amount of cash from the amount requested or charged.
+wrong_exchange_rate_for_cash_withdrawal: A cash withdrawal abroad used a wrong or poor exchange rate.

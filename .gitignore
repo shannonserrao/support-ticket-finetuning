@@ -11,6 +11,10 @@ data/*
 artifacts/*
 !artifacts/.gitkeep
 mlruns/
+# Baseline bundle (contains ticket text) and results downloaded from Databricks
+platforms/databricks/baseline/inputs/
+platforms/databricks/baseline/outputs/
+baseline_outputs/
 feedback/review_queue.csv
 feedback/reviewed.csv
 feedback/predictions_log.jsonl

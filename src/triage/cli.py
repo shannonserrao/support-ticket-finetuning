@@ -18,12 +18,16 @@ def _paths(cfg: dict) -> dict:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="triage")
     sub = parser.add_subparsers(dest="command", required=True)
-    for name in ("data", "train", "predict", "evaluate", "feedback-export", "feedback-ingest"):
+    for name in ("data", "train", "predict", "evaluate", "feedback-export", "feedback-ingest",
+                 "baseline-bundle", "baseline-import"):
         cmd = sub.add_parser(name)
         cmd.add_argument("--config", default="configs/base.yaml")
         cmd.add_argument("--set", action="append", default=[], metavar="KEY=VALUE")
         if name == "feedback-ingest":
             cmd.add_argument("--reviewed", required=True)
+        if name == "baseline-import":
+            cmd.add_argument("--from", dest="source", required=True, metavar="DIR",
+                             help="folder with the result files written by the baseline notebook")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     cfg = load_config(args.config, args.set)
@@ -56,6 +60,18 @@ def main(argv: list[str] | None = None) -> int:
             tracker.log_metrics(report["metrics"])
             tracker.log_artifact(out)
             print(json.dumps(report["metrics"], indent=2))
+    elif args.command == "baseline-bundle":
+        from .baseline import write_bundle
+
+        print(f"baseline bundle written to {write_bundle(cfg)}")
+    elif args.command == "baseline-import":
+        from .baseline import import_results
+
+        with Tracker(cfg, run_name="baseline") as tracker:
+            result = import_results(cfg, args.source, tracker)
+        print(json.dumps(result, indent=2))
+        print("Next: set baseline.model, the token prices and cost.baseline_usd_per_ticket in configs/base.yaml "
+              "from the values above, then run `make predict eval`.")
     elif args.command == "feedback-export":
         count = feedback.export_review_queue(
             fb["predictions_log"], fb["review_queue"], fb["corrections"],
