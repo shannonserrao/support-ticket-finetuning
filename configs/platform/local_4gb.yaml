@@ -1,0 +1,7 @@
+# Local laptop GPU with 4 GB (for example RTX 2050). Same training as base.yaml, less memory per forward pass.
+extends: ../base.yaml
+train:
+  micro_batch_size: 8       # batch_size stays 32; gradients are accumulated over 4 chunks
+  save_every_steps: 200     # resume quickly if the run is interrupted
+predict:
+  batch_size: 32
