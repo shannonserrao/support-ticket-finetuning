@@ -18,6 +18,13 @@ Run the model in batch with calibrated confidence and decide per ticket whether 
 ## 4. Routing
 - `route = "small"` if confidence is at least the threshold, else `"escalate"`.
 - Threshold selection (`routing.select: validation`): sweep thresholds on validation, compute cascade accuracy using cached baseline answers for validation items, pick the threshold with the lowest projected cost that meets `routing.target_accuracy`. Save to `artifacts/threshold.json`.
+  - Implemented in `routing.py`, called by `predict` before it routes. It reads only validation files: gold labels, the small model's validation predictions (also saved as `artifacts/predictions_validation.jsonl`) and `artifacts/baseline_predictions_validation.jsonl`. It never opens a test file.
+  - Sweep: 0.00 to 1.00 in steps of `routing.sweep_step`, plus one value above 1 (escalate everything).
+  - `routing.target_accuracy: null` means the baseline's accuracy on validation.
+  - Projected cost per ticket is small-model cost plus escalation rate times baseline cost. When a cost is not known yet, the escalation rate is used instead; the ordering is the same.
+  - If no threshold reaches the target, the most accurate one is used and `target_met` is false.
+  - `threshold.json` holds the threshold, target, validation results, model version, baseline model and the full validation curve.
+  - Without baseline answers for validation, `predict` logs a warning, deletes any existing `threshold.json` (it would belong to an earlier model or baseline) and uses `routing.confidence_threshold`.
 - `routing.select: fixed` uses `routing.confidence_threshold` as given.
 
 ## 5. Serving (stretch, T-17)

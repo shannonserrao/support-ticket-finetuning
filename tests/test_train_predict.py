@@ -192,3 +192,25 @@ def test_micro_batches_keep_the_step_count(cfg):
     meta = json.load(open(os.path.join(model_dir, "training_meta.json")))
     assert meta["steps"] == 12
     assert _metrics(tracker)["train_loss"] > 0
+
+
+def test_predict_fits_threshold_on_validation_when_baseline_answers_exist(cfg):
+    _train(cfg)
+    cfg["routing"] = {"select": "validation", "confidence_threshold": 0.5, "target_accuracy": None}
+    artifacts = cfg["paths"]["artifacts"]
+    with Tracker(cfg, "no-baseline", use_mlflow=False) as tracker:
+        preds = read_jsonl(predict(cfg, tracker))
+    assert not os.path.exists(os.path.join(artifacts, "threshold.json"))            # falls back to the fixed value
+    assert all(p["route"] == route(p["confidence"], 0.5) for p in preds)
+
+    validation = read_jsonl(os.path.join(cfg["paths"]["data"], "processed", "validation.jsonl"))
+    _write_jsonl(os.path.join(artifacts, "baseline_predictions_validation.jsonl"),
+                 [{"id": r["id"], "label": r["label"], "model": "big", "prompt_hash": "h"} for r in validation])
+    with Tracker(cfg, "with-baseline", use_mlflow=False) as tracker:
+        preds = read_jsonl(predict(cfg, tracker))
+    fit = json.load(open(os.path.join(artifacts, "threshold.json")))
+    assert fit["source"] == "validation" and fit["target_accuracy"] == 1.0           # the fake baseline is perfect
+    assert fit["model_version"] == preds[0]["model_version"]
+    assert all(p["route"] == route(p["confidence"], fit["threshold"]) for p in preds)
+    assert len(read_jsonl(os.path.join(artifacts, "predictions_validation.jsonl"))) == len(validation)
+    assert _metrics(tracker)["threshold"] == fit["threshold"]

@@ -38,6 +38,16 @@ databricks bundle run      -t dev train_job
 ```
 MLflow tracking is native on Databricks; `configs/platform/databricks.yaml` sets `tracking.uri: databricks`. Fill in the cluster node type and workspace host in `platforms/databricks/databricks.yml` before deploying. The bundle file is a starting template; validate it against your workspace.
 
+### Zero-shot baseline on Databricks
+The expensive baseline model runs from a notebook, not from the job above:
+```bash
+make baseline-bundle                           # writes platforms/databricks/baseline/inputs/
+# upload platforms/databricks/baseline/ to the workspace, run baseline_zero_shot.py, download outputs/
+make baseline-import FROM=./baseline_outputs   # validates and copies the results into artifacts/
+make predict eval                              # fits the threshold on validation, evaluates the cascade
+```
+Full procedure and the table of where each result file goes: `platforms/databricks/baseline/README.md`.
+
 ## 5. Make targets
 | Target | What it does | Spec |
 |---|---|---|
@@ -47,6 +57,8 @@ MLflow tracking is native on Databricks; `configs/platform/databricks.yaml` sets
 | `make train` | Fine-tune and log to the tracker | `specs/02-training.md` |
 | `make eval` | Score predictions, write report | `specs/03-evaluation.md` |
 | `make predict` | Batch inference with confidence | `specs/06-serving-and-routing.md` |
+| `make baseline-bundle` | Write the inputs for the remote baseline run | `specs/03-evaluation.md` §4 |
+| `make baseline-import FROM=dir` | Validate and import baseline results | `specs/03-evaluation.md` §4 |
 | `make feedback-export` | Write the human review queue | `specs/05-human-feedback.md` |
 | `make feedback-ingest` | Merge reviewed corrections | `specs/05-human-feedback.md` |
 | `make smoke` | Tiny CPU run of the whole pipeline | — |

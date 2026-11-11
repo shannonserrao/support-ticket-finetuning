@@ -29,7 +29,8 @@ This project is spec-driven. The documents are the source of truth; code follows
 ## Implemented vs stubbed
 Implemented and unit-tested: `config.py`, `metrics.py`, `evaluate.py`, `tracking.py`, `feedback.py`, `cli.py`.
 Implemented (T-02 to T-04, T-13): `data.py`.
-Implemented (T-06 to T-08): `modeling.py`, `train.py`, `predict.py`. Threshold selection on validation (T-09) is still open in `predict.py`. Implement them by following `TASKS.md`.
+Implemented (T-06 to T-08): `modeling.py`, `train.py`, `predict.py`.
+Implemented and unit-tested, waiting for the real baseline run (T-05, T-09): `baseline.py`, `routing.py`, `platforms/databricks/baseline/`. Implement them by following `TASKS.md`.
 
 ## Commit style
 Conventional Commits (`feat:`, `fix:`, `docs:`, `data:`, `exp:`). Reference the task, e.g. `feat(data): T-03 build manifest`.

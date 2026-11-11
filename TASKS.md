@@ -13,7 +13,8 @@ Work top to bottom. Tick the box in the commit that completes the task. Each tas
 
 ## Baseline
 - [ ] **T-05** Add `baseline.py`: zero-shot classification with the expensive model, on-disk response cache, token and cost accounting. Spec 03 §4. Check: baseline run on test logged with `baseline=true`; numbers copied to `docs/model_card.md`.
-  - **PARKED (2026-11-11):** no baseline model is provisioned yet. T-06 to T-08 do not need it; T-09 (cascade, threshold), T-10 (baseline column), T-11 and the cost numbers in T-12 do. Resume when `baseline.model` and pricing are set in `configs/base.yaml`.
+  - **Code done, run pending (2026-11-12):** `baseline.py` (prompt, parsing, cache, cost), the prompt and 77 label descriptions in `configs/baseline/`, and a Databricks notebook in `platforms/databricks/baseline/` with `make baseline-bundle` and `make baseline-import`. Still to do, by the repository owner: review the label descriptions, run the notebook against a model endpoint, import the results, set `baseline.model` and prices in `configs/base.yaml`. Procedure: `platforms/databricks/baseline/README.md`. The notebook has been tested only offline against a stand-in endpoint.
+  - T-10 (baseline column), T-11 and the cost numbers in T-12 wait on this run.
   - **Provisioning estimate** (one request per ticket, cached by model + prompt hash + id, so seeds and reruns add nothing):
     - Test, all 3,080 rows: baseline accuracy, paired bootstrap, cascade.
     - Validation, all 1,000 rows: threshold selection (spec 06 §4).
@@ -35,6 +36,7 @@ Work top to bottom. Tick the box in the commit that completes the task. Each tas
   - Checked 2026-11-11: predict run `3f6af4769e62` and evaluate run `63549461d487` produced `artifacts/report.json` for 3,080 test tickets (accuracy 0.911, macro F1 0.911, ECE 0.009, selective accuracy at 80% coverage 0.984, 16.3% escalated at the fixed 0.80 threshold; 521 tickets/s and p95 latency 66.7 ms on the RTX 2050). Single seed, no hyperparameter search yet; accuracy is below the 0.92 release gate.
   - Runs were tracked with the JSONL fallback (`artifacts/runs/`) because MLflow is not installed locally.
 - [ ] **T-09** Threshold selection on validation and cascade evaluation on test using cached baseline answers for escalated tickets. Spec 06 §4. Check: report contains the cascade curve and the chosen threshold; the threshold was fitted without reading the test file (unit test).
+  - **Code done, real report pending (2026-11-12):** `routing.py`, the cascade curve in `evaluate.py`, and unit tests including the no-test-file check (`tests/test_routing.py`). Not ticked: the real `artifacts/report.json` cannot contain a cascade until the T-05 baseline results are imported. After the import, run `make predict eval` and tick this.
 - [ ] **T-10** Three-seed final run; mean and standard deviation reported. Spec 03 §5.
 - [ ] **T-11** Results table and cost-versus-accuracy chart generated from tracked runs into `docs/results.md`. Spec 04. Check: every number has a run ID.
 

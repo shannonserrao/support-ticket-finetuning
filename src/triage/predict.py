@@ -1,7 +1,6 @@
 """Batch inference with calibrated confidence and routing. Returns the predictions path.
 
-Implements specs/06-serving-and-routing.md sections 2-3 and the routing rule of section 4 (T-08).
-Threshold selection on validation is T-09.
+Implements specs/06-serving-and-routing.md sections 2-4 (T-08, T-09). The threshold fit itself is in routing.py.
 """
 from __future__ import annotations
 
@@ -12,6 +11,7 @@ import time
 
 from .evaluate import _threshold
 from .feedback import read_jsonl
+from .routing import fit_threshold
 
 log = logging.getLogger("triage.predict")
 
@@ -45,12 +45,32 @@ def predict(cfg: dict, tracker) -> str:
         temperature = float(json.load(handle)["temperature"])
     with open(os.path.join(model_dir, "training_meta.json"), encoding="utf-8") as handle:
         model_version = json.load(handle)["model_version"]
-    threshold = _threshold(cfg)
 
     device = modeling.pick_device(cfg["train"].get("device", "auto"))
     tokenizer = AutoTokenizer.from_pretrained(model_dir)
     model = AutoModelForSequenceClassification.from_pretrained(model_dir).to(device).eval()
     max_length, texts = cfg["model"]["max_length"], [r["text"] for r in rows]
+
+    # Routing threshold (spec 06 section 4). With routing.select = validation it is fitted on validation
+    # predictions and cached baseline answers for validation; the split being predicted is not involved.
+    if cfg["routing"].get("select") == "validation":
+        val_rows = read_jsonl(os.path.join(paths["data"], "processed", "validation.jsonl"))
+        val_logits = modeling.compute_logits(model, tokenizer, [r["text"] for r in val_rows], max_length,
+                                             pcfg["batch_size"], device)
+        val_pred, val_conf = modeling.confidences(val_logits, temperature)
+        val_records = [{"id": r["id"], "label": labels[p], "confidence": round(c, 6), "model_version": model_version}
+                       for r, p, c in zip(val_rows, val_pred, val_conf)]
+        os.makedirs(paths["artifacts"], exist_ok=True)
+        with open(os.path.join(paths["artifacts"], "predictions_validation.jsonl"), "w", encoding="utf-8",
+                  newline="\n") as handle:
+            for record in val_records:
+                handle.write(json.dumps(record, ensure_ascii=False) + "\n")
+        fit = fit_threshold(cfg, val_records, model_version)
+        if fit:
+            tracker.log_metrics({"threshold": fit["threshold"], "threshold_target_met": int(fit["target_met"]),
+                                 "val_cascade_accuracy": fit["validation"]["cascade_accuracy"],
+                                 "val_escalation_rate": fit["validation"]["escalation_rate"]})
+    threshold = _threshold(cfg)
 
     # Throughput over the whole split at predict.batch_size, tokenisation included.
     modeling.compute_logits(model, tokenizer, texts[:pcfg["batch_size"]], max_length, pcfg["batch_size"], device)
